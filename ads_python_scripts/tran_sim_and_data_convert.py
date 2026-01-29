@@ -15,6 +15,8 @@ import seaborn as sns
 workspace_path = Path.cwd()
 #print(script_path)
 
+workspace = de.open(workspace_path)
+
 # --- Design Configuration ---
 # Define the Library name and the Schematic (Cell) name
 print("Please enter lib_name:/n")
