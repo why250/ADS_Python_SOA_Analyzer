@@ -1,0 +1,28 @@
+{
+  "description": "SOA Limits Configuration",
+  "units": "SI (Volts, Amperes, Watts, Celsius)",
+  "defaults": {
+    "BJT": {
+      "MAX_VCE": 3.0,
+      "MAX_VBE": 1.2,
+      "MAX_VBC": 1.2,
+      "MAX_IB": 0.015,
+      "MAX_IC": 0.015,
+      "MAX_IE": 0.015,
+      "MAX_POWER": 0.05,
+      "MAX_TEMP": 125.0
+    },
+    "RESISTOR": {
+      "MAX_RES_CURRENT": 0.01
+    }
+  },
+  "overrides": {
+    "Q_PowerStage": {
+      "MAX_IC": 0.5,
+      "MAX_POWER": 1.0
+    },
+    "R_Shunt": {
+      "MAX_RES_CURRENT": 0.1
+    }
+  }
+}
