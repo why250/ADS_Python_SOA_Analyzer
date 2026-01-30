@@ -1,0 +1,14 @@
+// -------------------------------------------------------------------------------------
+// Author: weihaoyu
+// Date: 2026-01-30 (yyyy-mm-dd)
+// Version: 1.0
+//
+// FUNCTIONALITY:
+//    soa_analysis add on menu
+// -------------------------------------------------------------------------------------
+
+decl workspace_path = getcwd();   // get current directory
+decl ads_path = getsysenv("HPEESOF_DIR");
+
+load("soa_analysis");
+load("menu");
