@@ -1,3 +1,8 @@
 .ads_python_soa/
+ads_venv/
 __pycache__/
 core/__pycache__/
+hpeesofsim.cfg
+de_sim.cfg
+ads_soa_gui.log
+ads_env_diagnosis_*

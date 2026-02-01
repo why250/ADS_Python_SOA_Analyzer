@@ -1,0 +1,1 @@
+pip download -r requirements_ads.txt --only-binary=:all: --platform win_amd64 --python-version 3.12 --implementation cp --no-deps -i https://mirrors.aliyun.com/pypi/simple/

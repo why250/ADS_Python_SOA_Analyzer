@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Optional
 
 
-def run_simulation_task(workspace: str, lib: str, cell: str) -> str:
+def run_simulation_task(workspace_path: str, design_name: str,cell_name: str) -> str:
     """
     Run ADS transient simulation using Keysight ADS Python APIs.
 
@@ -16,23 +16,23 @@ def run_simulation_task(workspace: str, lib: str, cell: str) -> str:
     from keysight.ads.de import db_uu as db
     from keysight.edatoolbox import ads
 
-    workspace_path = Path(workspace)
+    workspace_path = Path(workspace_path)
     if not workspace_path.exists():
         raise FileNotFoundError(f"Workspace path does not exist: {workspace_path}")
 
     # Open workspace
-    de.open(workspace_path)
+    if not de.workspace_is_open():
+        de.open_workspace(workspace_path)
 
-    design_str = f"{lib}:{cell}:schematic"
     target_output_dir = workspace_path / "data"
     target_output_dir.mkdir(parents=True, exist_ok=True)
 
-    design = db.open_design(design_str)
+    design = db.open_design(design_name)
     netlist = design.generate_netlist()
     simulator = ads.CircuitSimulator()
     simulator.run_netlist(netlist, output_dir=str(target_output_dir))
 
-    ds_path = target_output_dir / f"{cell}.ds"
+    ds_path = target_output_dir / f"{cell_name}.ds"
     return str(ds_path)
 
 

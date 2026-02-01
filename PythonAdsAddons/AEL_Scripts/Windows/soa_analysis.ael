@@ -1,0 +1,38 @@
+// -------------------------------------------------------------------------------------
+// Author: weihaoyu
+// Date: 2026-01-30 (yyyy-mm-dd)
+// Version: 1.0
+//
+// FUNCTIONALITY:
+//    python SOA analysis ael function
+// -------------------------------------------------------------------------------------
+defun launch_soa_analysis() {
+    decl winInst = api_get_current_window();
+    if (!de_window_has_valid_context(winInst)){
+        setenv("DIALOG_TIME_OUT",2000);
+        de_info("Please Open this menu in schematic window.", 1);
+        return;
+    }
+    decl context = de_get_design_context(winInst);
+
+    decl lib_name = db_get_library_name(context);
+    decl cell_name = db_get_cell_name(context);
+    decl view_name = db_get_view_name(context);
+    decl design_name = db_get_design_name(context);
+    decl workspace_path = getcwd();
+
+
+    // Launch GUI as a separate process (non-blocking)
+    decl gui_script = "D:\Users\Administrator\Documents\GitHub\ADS_Python_SOA_Analyzer\main.py";
+
+    // Build a short python snippet that uses subprocess to start the GUI
+    decl cmd = "";
+    cmd = strcat(cmd, "import subprocess, sys; ");
+    cmd = strcat(cmd, "args = [sys.executable, r'", gui_script, "', '", design_name, "', r'", workspace_path, "']; ");
+    cmd = strcat(cmd, "subprocess.Popen(args, close_fds=True)");
+
+    de_info(strcat("Launching external GUI (non-blocking):", gui_script));
+    python_exec(cmd);
+
+    de_info("SOA Analysis GUI started.");
+}

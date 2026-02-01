@@ -1,3 +1,5 @@
+我想通过ael调用gui main.py,传入design_name/workspace_path,实现在ADS中打开gui，再仿真和处理数据。
+
 **可以实现，而且这是一个非常棒的想法！** 这样可以将复杂的交互逻辑移出 ADS，利用 Python 强大的 GUI 生态（如 PyQt, Tkinter）来提升体验。
 
 但是，**有一个巨大的“坑”你需要避开**：那就是 **ADS 假死（UI 阻塞）** 问题。
@@ -65,12 +67,12 @@ if __name__ == "__main__":
 
 ---
 
-#### 第二步：修改 AEL 代码 (`launch_gui.ael`)
+#### 第二步：修改 AEL 代码 (`soa_analysis.ael`)
 
 我们不再 `import` 你的模块，而是用 `subprocess` 去调用 `python main.py arg1 arg2`。
 
 ```ael
-defun launch_soa_gui()
+defun launch_soa_analysis()
 {
     decl winInst = api_get_current_window();
     decl context = de_get_design_context(winInst);
@@ -82,7 +84,7 @@ defun launch_soa_gui()
     // 2. 定义路径
     // 注意：这里用 sys.executable 获取当前 ADS 使用的 Python 解释器路径
     // 也可以换成你系统里其他的 python 路径
-    decl gui_script = "/home/eda_grp/weihaoyu/ADS_Python_Tutorials/Scripts/SOA_Tran_Check/main.py";
+    decl gui_script = "D:\Users\Administrator\Documents\GitHub\ADS_Python_SOA_Analyzer\main.py";
 
     // 3. 构造 Python 启动脚本
     // 我们使用 subprocess.Popen，它不会阻塞 ADS
@@ -102,8 +104,7 @@ defun launch_soa_gui()
     python_exec(cmd);
 }
 
-// 添加菜单
-de_add_item("Schematic", "Tools", "Open SOA GUI", "launch_soa_gui");
+
 ```
 
 ### 3. 这种方案的优点

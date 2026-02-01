@@ -1,0 +1,52 @@
+// -------------------------------------------------------------------------------------
+// Author: weihaoyu
+// Date: 2026-01-30 (yyyy-mm-dd)
+// Version: 1.0
+//
+// FUNCTIONALITY:
+//    python SOA analysis ael function
+// -------------------------------------------------------------------------------------
+defun launch_soa_analysis() {
+    decl winInst = api_get_current_window();
+    if (!de_window_has_valid_context(winInst)){
+        setenv("DIALOG_TIME_OUT",2000);
+        de_info("Please Open this menu in schematic window.", 1);
+        return;
+    }
+    decl context = de_get_design_context(winInst);
+
+    decl lib_name = db_get_library_name(context);
+    decl cell_name = db_get_cell_name(context);
+    decl view_name = db_get_view_name(context);
+    decl design_name = db_get_design_name(context);
+    decl workspace_path = getcwd();
+
+
+    decl script_dir = "/home/eda_grp/weihaoyu/ADS_Python_Tutorials/Scripts/SOA_Tran_Check";
+
+    decl module_name = "tran_sim_and_data_convert";
+
+    // build python command
+    // import sys
+    // sys.path.append(script_dir)
+    // import tran_sim_and_data_convert as my_tool
+    // import importlib
+    // importlib.reload(my_tool)
+    // my_tool.tran_sim_and_data_convert(design_name,workspace_path)
+
+    decl cmd = "";
+
+    cmd = strcat(cmd,"import sys; sys.path.append(r'",script_dir,"');");
+    cmd = strcat(cmd,"import ",module_name," as my_tool; ");
+
+    cmd = strcat(cmd,"import importlib; importlib.reload(my_tool); ");
+
+    cmd = strcat(cmd,"my_tool.tran_sim_and_data_convert('",design_name,"',r'",workspace_path,"');");
+
+    de_info(strcat("Executing Python Command:",cmd));
+
+    python_exec(cmd);
+
+    //run python programe in terminal
+    de_info("Open SOA Analysis");
+}
