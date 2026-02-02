@@ -1,0 +1,1 @@
+pip install -r requirements_ads.txt --no-index --find-links=./ads_offline_packages
