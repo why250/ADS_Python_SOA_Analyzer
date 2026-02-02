@@ -182,3 +182,6 @@ Traceback (most recent call last):
   File "C:\Program Files\Keysight\ADS2025_Update2\tools\python\packages\keysight\ads\de\_core\cellviewref.py", line 78, in __init__
     raise TypeError('The "view" argument must be specified.')
 TypeError: The "view" argument must be specified.
+2026-02-02 10:06:10,337 INFO: Starting main.py; argv=['.\\main.py']
+2026-02-02 10:06:29,216 INFO: Starting main.py; argv=['.\\main.py']
+2026-02-02 10:24:32,062 INFO: Starting main.py; argv=['.\\main.py']

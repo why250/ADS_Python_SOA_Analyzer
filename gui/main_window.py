@@ -6,6 +6,7 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 import os
 from pathlib import Path
+from datetime import datetime
 import pandas as pd
 from PyQt6 import QtCore, QtWidgets
 import logging
@@ -294,18 +295,25 @@ class MainWindow(QtWidgets.QMainWindow):
         except Exception as e:
             # Log full traceback for diagnosis
             tb = traceback.format_exc()
+            log_file = Path.cwd() / "ads_soa_gui_error.log"
             try:
                 logger.exception("Simulation failed: %s", e)
             except Exception:
                 # If logger not configured, write to fallback file
-                with open("ads_soa_gui_error.log", "a", encoding="utf-8") as fh:
-                    fh.write(tb)
+                try:
+                    with open(log_file, "a", encoding="utf-8") as fh:
+                        fh.write(f"\n{'='*60}\n")
+                        fh.write(f"Error at {datetime.now().isoformat()}\n")
+                        fh.write(f"{'='*60}\n")
+                        fh.write(tb)
+                except Exception:
+                    pass  # If even logging fails, just show the error dialog
 
             # Show user-friendly error and advise to check logs
             QtWidgets.QMessageBox.critical(
                 self,
                 "Simulation Error",
-                f"{e}\n\n详细 traceback 已写入日志。请查看 ads_soa_gui.log 或 ads_soa_gui_error.log。",
+                f"{e}\n\n详细 traceback 已写入日志。\n请查看: {log_file}",
             )
             return
 
