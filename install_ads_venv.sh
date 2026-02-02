@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # 1. Define Paths (根据你的实际 Linux 安装路径修改)
-ADS_PATH="/usr/local/Keysight/ADS2025_Update2/tools/python" 
-ADS_PYTHON="$ADS_PATH/python"
+ADS_PATH="/eda/agilent/ADS2025/tools/python" 
+ADS_PYTHON="$ADS_PATH/bin/python3.12"
 WHEEL_DIR="$ADS_PATH/wheelhouse"
 VENV_NAME="ads_venv"
 

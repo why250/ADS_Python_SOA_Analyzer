@@ -22,31 +22,17 @@ defun launch_soa_analysis() {
     decl workspace_path = getcwd();
 
 
-    decl script_dir = "/home/eda_grp/weihaoyu/ADS_Python_Tutorials/Scripts/SOA_Tran_Check";
+    // Launch GUI as a separate process (non-blocking)
+    decl gui_script = "/home/eda_grp/weihaoyu/ADS_Python_SOA_Check/main.py";
 
-    decl module_name = "tran_sim_and_data_convert";
-
-    // build python command
-    // import sys
-    // sys.path.append(script_dir)
-    // import tran_sim_and_data_convert as my_tool
-    // import importlib
-    // importlib.reload(my_tool)
-    // my_tool.tran_sim_and_data_convert(design_name,workspace_path)
-
+    // Build a short python snippet that uses subprocess to start the GUI
     decl cmd = "";
+    cmd = strcat(cmd, "import subprocess, sys; ");
+    cmd = strcat(cmd, "args = [sys.executable, r'", gui_script, "', '", design_name, "', r'", workspace_path, "']; ");
+    cmd = strcat(cmd, "subprocess.Popen(args, close_fds=True)");
 
-    cmd = strcat(cmd,"import sys; sys.path.append(r'",script_dir,"');");
-    cmd = strcat(cmd,"import ",module_name," as my_tool; ");
-
-    cmd = strcat(cmd,"import importlib; importlib.reload(my_tool); ");
-
-    cmd = strcat(cmd,"my_tool.tran_sim_and_data_convert('",design_name,"',r'",workspace_path,"');");
-
-    de_info(strcat("Executing Python Command:",cmd));
-
+    de_info(strcat("Launching external GUI (non-blocking):", gui_script));
     python_exec(cmd);
 
-    //run python programe in terminal
-    de_info("Open SOA Analysis");
+    de_info("SOA Analysis GUI started.");
 }

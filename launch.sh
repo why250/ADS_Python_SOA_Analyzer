@@ -5,7 +5,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 # 2. 配置 ADS 环境
 export HPEESOF_DIR="/eda/agilent/ADS2025"
-export ADS_PYTHON="$HPEESOF_DIR/tools/python/bin/python3"
+export ADS_PYTHON="$HPEESOF_DIR/tools/python/bin/python3.12"
 
 # 配置库路径
 export PATH="$HPEESOF_DIR/bin:$PATH"
