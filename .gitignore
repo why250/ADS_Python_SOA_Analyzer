@@ -1,8 +1,13 @@
 .ads_python_soa/
 ads_venv/
+ads_venv_test/
+ads_venv_win/
 __pycache__/
 core/__pycache__/
 hpeesofsim.cfg
 de_sim.cfg
 ads_soa_gui.log
 ads_env_diagnosis_*
+ads_offline_packages/python/
+ads_offline_packages/python.rar
+ads_offline_packages/python.zip

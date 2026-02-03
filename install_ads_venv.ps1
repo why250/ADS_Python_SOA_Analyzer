@@ -1,8 +1,9 @@
 # 1. Define Paths
-$ADS_PATH = 'C:\Program Files\Keysight\ADS2025_Update2\tools\python'
+#$ADS_PATH = 'C:\Program Files\Keysight\ADS2025_Update2\tools\python'
+$ADS_PATH = '.\ads_offline_packages\python'
 $ADS_PYTHON = Join-Path $ADS_PATH 'python.exe'
 $WHEEL_DIR = Join-Path $ADS_PATH 'wheelhouse'
-$VENV_NAME = "ads_venv"
+$VENV_NAME = "ads_venv_win"
 
 Write-Host "--- Starting ADS Python Environment Setup ---" -ForegroundColor Cyan
 
