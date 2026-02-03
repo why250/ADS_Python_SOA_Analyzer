@@ -8,7 +8,7 @@ import os
 from pathlib import Path
 from datetime import datetime
 import pandas as pd
-from PyQt6 import QtCore, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 import logging
 import traceback
 
@@ -32,12 +32,7 @@ class AppState:
     violations_df: Optional[pd.DataFrame] = None
     limits_path: Optional[str] = None
     csv_path: Optional[str] = None
-    workspace: str = str(Path.cwd())
-    lib_name: str = "SOA_Tran_Check.lib"
-    cell_name: str = "TB_EF_Tran"
-    view_name: str = "schematic"
-    design_name: str = "SOA_Tran_Check.lib:TB_EF_Tran:schematic"
-    last_ds_path: Optional[str] = None
+
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -63,29 +58,7 @@ class MainWindow(QtWidgets.QMainWindow):
         left_widget = QtWidgets.QWidget()
         left_layout = QtWidgets.QVBoxLayout(left_widget)
 
-        # --- ADS Simulation & Data group ---
-        sim_group = QtWidgets.QGroupBox("ADS Simulation & Data")
-        sim_layout = QtWidgets.QVBoxLayout(sim_group)
 
-        # Workspace (label above input, same style as Design)
-        sim_layout.addWidget(QtWidgets.QLabel("Workspace:"))
-        self.edit_workspace = QtWidgets.QLineEdit(self.state.workspace)
-        sim_layout.addWidget(self.edit_workspace)
-
-        # Design (replaces Lib/Cell inputs). Editable so user can change before running.
-        self.edit_design = QtWidgets.QLineEdit(self.state.design_name)
-        sim_layout.addWidget(QtWidgets.QLabel("Design:"))
-        sim_layout.addWidget(self.edit_design)
-
-        # Simulation buttons
-        btn_run_sim = QtWidgets.QPushButton("Run Simulation")
-        btn_convert_ds = QtWidgets.QPushButton("Convert .ds to Dataframe")
-        btn_run_sim.clicked.connect(self.on_run_simulation)
-        btn_convert_ds.clicked.connect(self.on_convert_ds)
-        sim_layout.addWidget(btn_run_sim)
-        sim_layout.addWidget(btn_convert_ds)
-
-        left_layout.addWidget(sim_group)
 
         # Existing CSV / JSON controls
         btn_load_csv = QtWidgets.QPushButton("Load CSV Data")
@@ -188,10 +161,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
     # ---------------- File operations ----------------
     def on_load_csv(self) -> None:
-        # Default path: workspace/data/{cell_name}.csv (same base as .ds)
-        start_dir = str(Path(self.state.workspace) / "data") if self.state.workspace else ""
         path, _ = QtWidgets.QFileDialog.getOpenFileName(
-            self, "Open CSV Data", start_dir, "CSV Files (*.csv);;All Files (*)"
+            self, "Open CSV Data", "", "CSV Files (*.csv);;All Files (*)"
         )
         if not path:
             return
@@ -257,116 +228,9 @@ class MainWindow(QtWidgets.QMainWindow):
         return True
 
     # ---------------- ADS Simulation & Data ----------------
-    def on_browse_workspace(self) -> None:
-        directory = QtWidgets.QFileDialog.getExistingDirectory(
-            self, "Select ADS Workspace", self.state.workspace
-        )
-        if not directory:
-            return
-        self.state.workspace = directory
-        self.edit_workspace.setText(directory)
-
-    def on_run_simulation(self) -> None:
-        """Run ADS transient simulation to generate .ds file (no conversion)."""
-        from core.ads_sim import run_simulation_task
-
-        workspace_path = self.edit_workspace.text().strip()
-
-        # Design (cell) is provided from ADS and editable in the Design field
-        design_name = self.edit_design.text().strip()
-
-        [lib_name,cell_name,view_name] = design_name.split(":")
 
 
-        if not workspace_path or not design_name:
-            QtWidgets.QMessageBox.warning(
-                self, "Warning", "Please specify Workspace and Design."
-            )
-            return
 
-        self.state.workspace = workspace_path
-        self.state.design_name = design_name
-        self.state.lib_name = lib_name
-        self.state.cell_name = cell_name
-        self.state.view_name = view_name
-
-        try:
-            ds_path = run_simulation_task(workspace_path, design_name,cell_name)
-        except Exception as e:
-            # Log full traceback for diagnosis
-            tb = traceback.format_exc()
-            log_file = Path.cwd() / "ads_soa_gui_error.log"
-            try:
-                logger.exception("Simulation failed: %s", e)
-            except Exception:
-                # If logger not configured, write to fallback file
-                try:
-                    with open(log_file, "a", encoding="utf-8") as fh:
-                        fh.write(f"\n{'='*60}\n")
-                        fh.write(f"Error at {datetime.now().isoformat()}\n")
-                        fh.write(f"{'='*60}\n")
-                        fh.write(tb)
-                except Exception:
-                    pass  # If even logging fails, just show the error dialog
-
-            # Show user-friendly error and advise to check logs
-            QtWidgets.QMessageBox.critical(
-                self,
-                "Simulation Error",
-                f"{e}\n\n详细 traceback 已写入日志。\n请查看: {log_file}",
-            )
-            return
-
-        self.state.last_ds_path = ds_path
-        self.lbl_status.setText(f"Simulation finished. Dataset: {ds_path}")
-
-        # Auto chain: convert_ds -> load_csv -> load_json -> analyze
-        if not self._convert_ds_from_path(ds_path, show_message=False):
-            return
-        if not self.state.defaults:
-            default_json = Path.cwd() / "soa_limits_ex.json"
-            if default_json.exists():
-                self._load_json_from_path(str(default_json), show_message=False)
-        if self.state.df is not None and self.state.defaults:
-            self.refresh_devices_and_analysis()
-
-        QtWidgets.QMessageBox.information(
-            self, "Simulation Finished", f"Dataset saved at:\n{ds_path}\n\nConvert, load CSV/JSON and analyze completed."
-        )
-
-    def _convert_ds_from_path(self, ds_path: str, show_message: bool = True) -> bool:
-        """Convert .ds at ds_path to CSV and load into GUI. Returns True on success."""
-        from core.ads_sim import convert_ds_task
-
-        try:
-            csv_path = convert_ds_task(ds_path)
-        except Exception as e:
-            QtWidgets.QMessageBox.critical(self, "Conversion Error", str(e))
-            return False
-
-        self.state.last_ds_path = ds_path
-        self.lbl_status.setText(f"Converted dataset to CSV: {csv_path}")
-        return self._load_csv_from_path(csv_path, show_message=show_message)
-
-    def on_convert_ds(self) -> None:
-        """Select a .ds file, convert to CSV and load it into the SOA GUI."""
-        # Default directory: last ds location or workspace/data/{cell_name}.ds
-        start_dir = ""
-        if self.state.last_ds_path:
-            start_dir = str(Path(self.state.last_ds_path).parent)
-        elif self.state.workspace:
-            start_dir = str(Path(self.state.workspace) / "data")
-
-        path, _ = QtWidgets.QFileDialog.getOpenFileName(
-            self,
-            "Select ADS Dataset (.ds)",
-            start_dir,
-            "ADS Dataset (*.ds);;All Files (*)",
-        )
-        if not path:
-            return
-
-        self._convert_ds_from_path(path, show_message=True)
 
     def _update_analyze_button_state(self) -> None:
         """Enable Analyze button only if both CSV and JSON are loaded."""
@@ -430,7 +294,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if bjt_root and bjt_root.childCount() > 0:
             first_item = bjt_root.child(0)
             self.tree_devices.setCurrentItem(first_item)
-            # PyQt6: selection API is on the item, not QTreeWidget
+            # Selection API is on the item
             first_item.setSelected(True)
             # Manually trigger plot update
             self.on_device_selected()

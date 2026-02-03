@@ -1,6 +1,8 @@
 # ADS Python SOA Check
 
-本项目实现一个桌面 GUI（PyQt6 + Matplotlib），用于读取 ADS 瞬态仿真导出的 CSV，并依据 JSON 限值配置检查器件 SOA。
+本项目实现一个桌面 GUI（PyQt5 + Matplotlib），用于读取 ADS 瞬态仿真导出的 CSV，并依据 JSON 限值配置检查器件 SOA。
+
+> **🎉 已升级为 Python 3.9 + PyQt5 版本**（查看 [UPGRADE_COMPLETE.md](./UPGRADE_COMPLETE.md) 了解详情）
 
 ## 目录结构
 

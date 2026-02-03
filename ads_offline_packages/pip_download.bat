@@ -1,1 +1,1 @@
-pip download -r requirements_ads.txt --only-binary=:all: --platform win_amd64 --python-version 3.12 --implementation cp --no-deps -i https://mirrors.aliyun.com/pypi/simple/
+pip download -r requirements_ads.txt --only-binary=:all: --platform manylinux2014_x86_64 --python-version 3.12 --implementation cp -i https://mirrors.aliyun.com/pypi/simple/
