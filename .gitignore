@@ -1,6 +1,7 @@
 .ads_python_soa/
 ads_venv/
 ads_venv_test/
+ads_venv_win/
 __pycache__/
 core/__pycache__/
 hpeesofsim.cfg

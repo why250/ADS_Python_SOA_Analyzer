@@ -12,8 +12,29 @@ import threading
 import logging
 from pathlib import Path
 
-# Setup simple file logger to capture startup errors when launched from ADS
-log_file = Path(__file__).parent / "ads_soa_gui.log"
+# Setup simple file logger to capture startup errors when launched from ADS.
+# If ADS passes workspace_path as argv[2], place ads_soa_gui.log under
+# workspace/data so that it sits alongside the generated .ds dataset.
+workspace_from_argv: Optional[Path] = None
+if len(sys.argv) >= 3:
+    try:
+        workspace_from_argv = Path(sys.argv[2])
+    except Exception:
+        workspace_from_argv = None
+
+if workspace_from_argv is not None:
+    log_dir = workspace_from_argv / "data"
+else:
+    # Fallback when running standalone (no ADS arguments)
+    log_dir = Path(__file__).parent
+
+try:
+    log_dir.mkdir(parents=True, exist_ok=True)
+except Exception:
+    # If we cannot create the desired directory, fall back to script directory
+    log_dir = Path(__file__).parent
+
+log_file = log_dir / "ads_soa_gui.log"
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s: %(message)s",

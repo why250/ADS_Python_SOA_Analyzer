@@ -297,8 +297,15 @@ class MainWindow(QtWidgets.QMainWindow):
             try:
                 logger.exception("Simulation failed: %s", e)
             except Exception:
-                # If logger not configured, write to fallback file
-                with open("ads_soa_gui_error.log", "a", encoding="utf-8") as fh:
+                # If logger not configured, write to fallback file under workspace/data
+                try:
+                    log_dir = Path(workspace_path) / "data"
+                    log_dir.mkdir(parents=True, exist_ok=True)
+                    error_log = log_dir / "ads_soa_gui_error.log"
+                except Exception:
+                    # As a last resort, drop back to current working directory
+                    error_log = Path("ads_soa_gui_error.log")
+                with open(error_log, "a", encoding="utf-8") as fh:
                     fh.write(tb)
 
             # Show user-friendly error and advise to check logs
