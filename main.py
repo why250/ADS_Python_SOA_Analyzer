@@ -23,10 +23,10 @@ logger = logging.getLogger(__name__)
 logger.info("Starting main.py; argv=%s", sys.argv)
 
 try:
-    from PyQt6 import QtWidgets, QtCore
+    from PySide2 import QtWidgets, QtCore
 except ModuleNotFoundError as e:  # pragma: no cover
     raise SystemExit(
-        "缺少依赖：PyQt6。\n"
+        "缺少依赖：PySide2。\n"
         "请先安装依赖：\n"
         "  pip install -r requirements.txt\n"
     ) from e

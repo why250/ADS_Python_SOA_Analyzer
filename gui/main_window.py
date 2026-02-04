@@ -7,7 +7,7 @@ import numpy as np
 import os
 from pathlib import Path
 import pandas as pd
-from PyQt6 import QtCore, QtWidgets
+from PySide2 import QtCore, QtWidgets
 import logging
 import traceback
 
@@ -55,7 +55,7 @@ class MainWindow(QtWidgets.QMainWindow):
         main_layout = QtWidgets.QVBoxLayout(central)
 
         splitter = QtWidgets.QSplitter()
-        splitter.setOrientation(QtCore.Qt.Orientation.Horizontal)
+        splitter.setOrientation(QtCore.Qt.Horizontal)
         main_layout.addWidget(splitter)
 
         # Left panel
@@ -445,13 +445,13 @@ class MainWindow(QtWidgets.QMainWindow):
         for dev in self.state.bjt_devices:
             status = "FAIL" if dev.name in violated else "OK"
             item = QtWidgets.QTreeWidgetItem([dev.name, status])
-            item.setData(0, QtCore.Qt.ItemDataRole.UserRole, ("BJT", dev.name))
+            item.setData(0, QtCore.Qt.UserRole, ("BJT", dev.name))
             bjt_root.addChild(item)
 
         for dev in self.state.res_devices:
             status = "FAIL" if dev.name in violated else "OK"
             item = QtWidgets.QTreeWidgetItem([dev.name, status])
-            item.setData(0, QtCore.Qt.ItemDataRole.UserRole, ("RES", dev.name))
+            item.setData(0, QtCore.Qt.UserRole, ("RES", dev.name))
             res_root.addChild(item)
 
         self.tree_devices.addTopLevelItem(bjt_root)
@@ -483,7 +483,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if not items:
             return
         item = items[0]
-        data = item.data(0, QtCore.Qt.ItemDataRole.UserRole)
+        data = item.data(0, QtCore.Qt.UserRole)
         if not data:
             return
         dev_type, name = data

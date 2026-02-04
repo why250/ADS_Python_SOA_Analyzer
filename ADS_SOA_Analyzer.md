@@ -2,7 +2,7 @@
 
 ---
 
-# ADS Simulation Data SOA Analyzer - 软件需求文档 (Final v1.0)
+# ADS Simulation Data SOA Analyzer - 软件需求文档 (Final v1.0, PySide2 版本)
 
 ## 1. 项目概述
 **目标**：开发一个基于 Python 的桌面 GUI 应用程序，用于处理 ADS (Advanced Design System) 瞬态仿真导出的 CSV 数据。
@@ -10,7 +10,7 @@
 
 **技术栈要求**：
 *   **语言**：Python 3.x
-*   **GUI 框架**：PyQt6 或 PySide6 或  Tkinter
+*   **GUI 框架**：PySide2（当前实现）或 PySide6 或  Tkinter
 *   **数据处理**：Pandas, NumPy
 *   **绘图**：Matplotlib
 
