@@ -22,6 +22,24 @@ def short_name_from_column(col: str) -> str:
     return col
 
 
+def bjt_device_name_from_base_key(base_key: str) -> str:
+    """
+    Device name for BJT: distinguishes Q1 vs X1.Q1 (Q1 inside module X1).
+    Strip trailing '.Q<id>' so 'Q1.Q1' -> 'Q1', 'X1.Q1.Q1' -> 'X1.Q1'.
+    """
+    return re.sub(r"\.Q\w*$", "", base_key) or base_key
+
+
+def resistor_device_name_from_column(col: str) -> str:
+    """
+    Device name for resistor: full prefix so R1.R_contact and R2.R_contact are distinct.
+    Example: 'R1.R_contact.i' -> 'R1.R_contact', 'R2.R_contact.i' -> 'R2.R_contact'
+    """
+    if col.endswith(".R_contact.i"):
+        return col[: -len(".i")]  # strip trailing ".i" only
+    return short_name_from_column(col)
+
+
 def scan_csv_columns(df: pd.DataFrame, defaults: Dict, overrides: Dict) -> Tuple[List[BJTDevice], List[ResistorDevice], str]:
     """
     Auto-discover BJT and resistor devices based on column suffix rules.
@@ -42,10 +60,10 @@ def scan_csv_columns(df: pd.DataFrame, defaults: Dict, overrides: Dict) -> Tuple
     for col in columns:
         if col == time_col:
             continue
-        m = re.search(r"\.(c|b|e|bi|ci|ei|t)$", col)
+        m = re.search(r"\.(c|b|e|Lb\.i|Lc\.i|Le\.i|t)$", col)
         if m:
             suf = m.group(1)
-            base_key = col[: -len(m.group(0))]  # strip ".c" etc.
+            base_key = col[: -len(m.group(0))]  # strip ".c" or ".Lb.i" etc.
             grp = bjt_groups.setdefault(base_key, {})
             grp[suf] = col
 
@@ -54,7 +72,14 @@ def scan_csv_columns(df: pd.DataFrame, defaults: Dict, overrides: Dict) -> Tuple
         if not all(k in grp for k in ("c", "b", "e")):
             continue
 
-        name = short_name_from_column(base_key)
+        name = bjt_device_name_from_base_key(base_key)
+        # Merge currents from same device (e.g. Q1.Lb.i for base_key Q1.Q1, or X1.Q1 for X1.Q1.Q1)
+        name_grp = bjt_groups.get(name, {})
+        col_ib = grp.get("Lb.i") or name_grp.get("Lb.i")
+        col_ic = grp.get("Lc.i") or name_grp.get("Lc.i")
+        col_ie = grp.get("Le.i") or name_grp.get("Le.i")
+        col_temp = grp.get("t") or name_grp.get("t")
+
         merged = {**defaults.get("BJT", {}), **overrides.get(name, {})}
         limits = BJTLimits(
             MAX_VCE=merged.get("MAX_VCE", float("inf")),
@@ -73,10 +98,10 @@ def scan_csv_columns(df: pd.DataFrame, defaults: Dict, overrides: Dict) -> Tuple
                 col_vc=grp["c"],
                 col_vb=grp["b"],
                 col_ve=grp["e"],
-                col_ib=grp.get("bi"),
-                col_ic=grp.get("ci"),
-                col_ie=grp.get("ei"),
-                col_temp=grp.get("t"),
+                col_ib=col_ib,
+                col_ic=col_ic,
+                col_ie=col_ie,
+                col_temp=col_temp,
                 limits=limits,
             )
         )
@@ -84,7 +109,7 @@ def scan_csv_columns(df: pd.DataFrame, defaults: Dict, overrides: Dict) -> Tuple
     resistor_devices: List[ResistorDevice] = []
     for col in columns:
         if col.endswith(".R_contact.i"):
-            name = short_name_from_column(col)
+            name = resistor_device_name_from_column(col)
             merged = {**defaults.get("RESISTOR", {}), **overrides.get(name, {})}
             limits = ResistorLimits(MAX_RES_CURRENT=merged.get("MAX_RES_CURRENT", float("inf")))
             resistor_devices.append(ResistorDevice(name=name, col_ir=col, limits=limits))

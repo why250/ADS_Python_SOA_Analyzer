@@ -34,7 +34,7 @@ except ModuleNotFoundError as e:  # pragma: no cover
 from gui.main_window import MainWindow
 
 
-def _background_run(workspace: str, lib: str, cell: str, win: MainWindow) -> None:
+def _background_run(workspace: str, design_name: str,cell_name: str,win: MainWindow) -> None:
     """Run ADS simulation and conversion in a background thread, then
     schedule CSV loading on the Qt main thread."""
     try:
@@ -48,7 +48,7 @@ def _background_run(workspace: str, lib: str, cell: str, win: MainWindow) -> Non
         return
 
     try:
-        ds_path = run_simulation_task(workspace, lib, cell)
+        ds_path = run_simulation_task(workspace, design_name,cell_name)
     except Exception as e:
         logger.exception("Simulation failed: %s", e)
         def _sim_err():
@@ -134,11 +134,11 @@ def main(argv: Optional[list] = None) -> int:
     if workspace_path and design_name:
         # Use parsed/internal lib name and the GUI cell name
         lib = win.state.lib_name
-        cell = win.state.cell_name
-        t = threading.Thread(target=_background_run, args=(workspace_path, lib, cell, win), daemon=True)
+        cell_name = win.state.cell_name
+        t = threading.Thread(target=_background_run, args=(workspace_path,design_name, cell_name,win), daemon=True)
         t.start()
 
-    return app.exec()
+    return app.exec_()
 
 
 if __name__ == "__main__":
