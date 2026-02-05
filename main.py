@@ -12,6 +12,21 @@ import threading
 import logging
 from pathlib import Path
 
+import sys
+import os
+# ========================================================
+# 新增代码：强制将当前脚本所在目录加入搜索路径
+# ========================================================
+# 1. 获取 main.py 的绝对路径
+current_file_path = os.path.abspath(__file__)
+# 2. 获取 main.py 所在的文件夹路径 (即 ADS_Python_SOA_Analyzer)
+project_root = os.path.dirname(current_file_path)
+
+# 3. 将这个路径插入到 sys.path 的最前面，确保能找到同级目录下的 gui 文件夹
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+# ========================================================
+
 # Setup simple file logger to capture startup errors when launched from ADS.
 # If ADS passes workspace_path as argv[2], place ads_soa_gui.log under
 # workspace/data so that it sits alongside the generated .ds dataset.
