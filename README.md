@@ -11,9 +11,7 @@
 
 ## 安装依赖
 
-```bash
-pip install -r requirements.txt
-```
+使用 `ADS2025_Update2/tools/python`创建虚拟环境。
 
 ## 运行
 
@@ -26,5 +24,4 @@ python main.py
 1. 点击 `Load CSV Data` 选择待处理 CSV（例如 `test_tran_ex.csv`）
 2. 点击 `Load Limit Config (JSON)` 选择 SOA 配置（例如 `soa_limits_ex.json`）
 3. 左侧树点击器件，右侧查看 SOA 轨迹/时域波形/电阻电流曲线
-4. 底部表格会列出所有超限记录，可导出 CSV
-
+4. Result Tabel表格会列出所有超限记录，可导出 CSV
